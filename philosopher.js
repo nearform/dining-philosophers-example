@@ -1,5 +1,5 @@
 import { workerData, parentPort } from 'node:worker_threads'
-import { setTimeout } from 'node:timers/promises'
+import { setTimeout as sleep } from 'node:timers/promises'
 
 const { philosopher, fork1, fork2 } = workerData
 
@@ -8,7 +8,7 @@ function log(...params) {
 }
 
 function randomDelay() {
-  return Math.floor(Math.random() * 6000) + 200
+  return Math.floor(Math.random() * 600) + 200
 }
 
 parentPort.on('message', async forks => {
@@ -32,25 +32,20 @@ parentPort.on('message', async forks => {
   while (true) {
     const thinkingTime = randomDelay()
     log(`thinking...`)
-
-    await setTimeout(thinkingTime)
-
+    await sleep(thinkingTime)
     log('is hungry')
 
     log('waiting for fork', fork1)
     waitForFork(fork1)
 
-    await setTimeout(200)
+    await sleep(200)
 
     log('waiting for fork', fork2)
     waitForFork(fork2)
 
     const eatingTime = randomDelay()
-
     log(`eating...`)
-
-    await setTimeout(eatingTime)
-
+    await sleep(eatingTime)
     log('finished eating')
 
     freeForks()
