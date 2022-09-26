@@ -1,7 +1,7 @@
 {
-  "name": "bench-template",
+  "name": "dining-philosophers-example",
   "version": "1.0.0",
-  "description": "Template to start a new repository on the bench",
+  "description": "Example of dining philosophers problem",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -11,15 +11,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nearform/bench-template.git"
+    "url": "git+https://github.com/nearform/dining-philosophers-example.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/nearform/bench-template/issues"
+    "url": "https://github.com/nearform/dining-philosophers-example/issues"
   },
-  "homepage": "https://github.com/nearform/bench-template#readme",
+  "homepage": "https://github.com/nearform/dining-philosophers-example#readme",
   "devDependencies": {
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",

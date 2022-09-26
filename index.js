@@ -1,4 +1,4 @@
-const { Worker } = require('node:worker_threads')
+import { Worker } from 'node:worker_threads'
 
 const numberOfPhilosophers = 5
 

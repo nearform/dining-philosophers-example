@@ -1,5 +1,5 @@
-const { workerData, parentPort } = require('node:worker_threads')
-const { setTimeout } = require('timers/promises')
+import { workerData, parentPort } from 'node:worker_threads'
+import { setTimeout } from 'node:timers/promises'
 
 const { philosopherIndex, fork1Index, fork2Index } = workerData
 
