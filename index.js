@@ -2,23 +2,22 @@ import { Worker } from 'node:worker_threads'
 
 const numberOfPhilosophers = 5
 
-const forks = new SharedArrayBuffer(
+const buffer = new SharedArrayBuffer(
   numberOfPhilosophers * Int32Array.BYTES_PER_ELEMENT
 )
+
+const forks = new Int32Array(buffer)
 
 const philosophers = Array(numberOfPhilosophers)
   .fill(null)
   .map(
-    (_, philosopherIndex, { length }) =>
+    (_, philosopher, { length }) =>
       new Worker('./philosopher.js', {
         workerData: {
-          philosopherIndex,
+          philosopher,
           // resource hierarchy logic
-          fork1Index: philosopherIndex < length - 1 ? philosopherIndex : 0,
-          fork2Index:
-            philosopherIndex < length - 1
-              ? philosopherIndex + 1
-              : philosopherIndex
+          fork1: philosopher < length - 1 ? philosopher : 0,
+          fork2: philosopher < length - 1 ? philosopher + 1 : philosopher
         }
       })
   )
