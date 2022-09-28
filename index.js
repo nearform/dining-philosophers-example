@@ -1,7 +1,4 @@
 import { Worker } from 'node:worker_threads'
-import Fastify from 'fastify'
-import fastifyWs from '@fastify/websocket'
-
 const numberOfPhilosophers = 5
 
 const buffer = new SharedArrayBuffer(
@@ -10,7 +7,7 @@ const buffer = new SharedArrayBuffer(
 
 const forks = new Int32Array(buffer)
 
-const philosophers = Array(numberOfPhilosophers)
+export const philosophers = Array(numberOfPhilosophers)
   .fill(null)
   .map(
     (_, philosopher, { length }) =>
@@ -25,24 +22,3 @@ const philosophers = Array(numberOfPhilosophers)
   )
 
 philosophers.forEach(p => p.postMessage(forks))
-
-const fastify = Fastify()
-
-fastify.register(fastifyWs)
-
-fastify.register(async function (fastify) {
-  fastify.get('/', { websocket: true }, connection => {
-    philosophers.forEach(p =>
-      p.on('message', workerMessage => {
-        connection.socket.send(JSON.stringify(workerMessage))
-      })
-    )
-  })
-})
-
-fastify.listen({ port: 3000 }, err => {
-  if (err) {
-    fastify.log.error(err)
-    process.exit(1)
-  }
-})
