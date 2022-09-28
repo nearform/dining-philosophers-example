@@ -32,5 +32,9 @@
   },
   "lint-staged": {
     "*.{js,jsx}": "eslint --cache --fix"
+  },
+  "dependencies": {
+    "@fastify/websocket": "^7.0.1",
+    "fastify": "^4.6.0"
   }
 }
