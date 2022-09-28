@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dining philosophers problem</title>
+  </head>
+  <body></body>
+
+  <script type="module">
+    import * as d3 from 'https://cdn.skypack.dev/d3@7'
+    const philosophers = [1, 2, 3, 4, 5]
+
+    const svg = d3
+      .select('body')
+      .append('svg')
+      .attr('width', 1200)
+      .attr('height', 1200)
+
+    // Draw philosopher circles
+    const circles = svg
+      .data(philosophers)
+      .enter()
+      .select('svg')
+      .append('circle')
+      .attr('cy', (d, i) => 10 + i * 20)
+      .attr('cx', (d, i) => 10 + i * 20)
+      .attr('r', 10)
+      .attr('fill', 'dodgerblue')
+
+    const tableCy = 300
+    const tableCx = 300
+
+    // Draw table
+    const table = d3
+      .select('svg')
+      .append('circle')
+      .attr('cy', tableCy)
+      .attr('cx', tableCx)
+      .attr('r', 100)
+      .attr('fill', 'tomato')
+
+    // Draw plates
+    d3.select('svg')
+      .append('circle')
+      .attr('cy', tableCy)
+      .attr('cx', tableCx + 70)
+      .attr('r', 20)
+      .attr('fill', 'bisque')
+  </script>
+</html>
