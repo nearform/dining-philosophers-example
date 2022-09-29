@@ -6,47 +6,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dining philosophers problem</title>
   </head>
-  <body></body>
+  <body>
+    <svg width="1200" height="1200">
+      <g class="table"></g>
+      <g class="chairs"></g>
+      <g class="plates"></g>
+      <g class="forks"></g>
+    </svg>
+
+    <input type="number" />
+  </body>
 
   <script type="module">
     import * as d3 from 'https://cdn.skypack.dev/d3@7'
-    const philosophers = [1, 2, 3, 4, 5]
+    let socket = new WebSocket('ws://localhost:3000')
+    socket.onopen = () => socket.send('start')
 
-    const svg = d3
-      .select('body')
-      .append('svg')
-      .attr('width', 1200)
-      .attr('height', 1200)
+    socket.onmessage = event => {
+      // TODO: Add some error handling here
+      const message = JSON.parse(event.data)
 
-    // Draw philosopher circles
-    const circles = svg
-      .data(philosophers)
-      .enter()
-      .select('svg')
-      .append('circle')
-      .attr('cy', (d, i) => 10 + i * 20)
-      .attr('cx', (d, i) => 10 + i * 20)
-      .attr('r', 10)
-      .attr('fill', 'dodgerblue')
+      const philosophers = Array(5).fill(null)
 
-    const tableCy = 300
-    const tableCx = 300
+      var svg = d3.select('body').attr('width', 1200).attr('height', 1200)
 
-    // Draw table
-    const table = d3
-      .select('svg')
-      .append('circle')
-      .attr('cy', tableCy)
-      .attr('cx', tableCx)
-      .attr('r', 100)
-      .attr('fill', 'tomato')
+      const tableSize = 80 * (philosophers.length / 3)
+      // TODO: Get screen size and center it?
+      const tableY = 300
+      const tableX = 300
 
-    // Draw plates
-    d3.select('svg')
-      .append('circle')
-      .attr('cy', tableCy)
-      .attr('cx', tableCx + 70)
-      .attr('r', 20)
-      .attr('fill', 'bisque')
+      const chairMargin = 90 * (philosophers.length / 3)
+      const chairSize = 40
+
+      // TODO: Check margins in more extreme cases.
+      const plateSize = 20
+      const plateMargin = 50 * (philosophers.length / 3)
+
+      const calcX = (margin, radius) => (d, i) =>
+        tableX +
+        (margin + radius) * Math.sin(i * 2 * (Math.PI / philosophers.length))
+
+      const calcY = (margin, radius) => (d, i) =>
+        tableY +
+        (margin + radius) * Math.cos(i * 2 * (Math.PI / philosophers.length))
+
+      // Draw philosopher chairs
+      const chairs = d3
+        .select('.chairs')
+        .selectAll('circle')
+        .data(philosophers)
+        .enter()
+        .append('circle')
+        .attr('cy', calcY(chairMargin, chairSize))
+        .attr('cx', calcX(chairMargin, chairSize))
+        .attr('r', chairSize)
+        .attr('fill', 'dodgerblue')
+
+      // Draw table
+      const table = d3
+        .select('.table')
+        .append('circle')
+        .attr('cy', tableY)
+        .attr('cx', tableX)
+        .attr('r', tableSize)
+        .attr('fill', 'tomato')
+
+      // Draw plates
+      const plates = d3
+        .select('.plates')
+        .selectAll('circle')
+        .data(philosophers)
+        .enter()
+        .append('circle')
+        .attr('cy', calcY(plateMargin, plateSize))
+        .attr('cx', calcX(plateMargin, plateSize))
+        .attr('r', plateSize)
+        .attr('fill', 'beige')
+
+      // Draw plates
+      const forks = d3
+        .select('.forks')
+        .selectAll('rect')
+        .data(philosophers)
+        .enter()
+        .append('g')
+        .append('rect')
+        .attr('y', calcY(plateMargin, plateSize))
+        .attr('x', calcX(plateMargin, plateSize))
+        .attr('width', 9)
+        .attr('height', 30)
+        .attr('fill', 'brown')
+    }
   </script>
 </html>
