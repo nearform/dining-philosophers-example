@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node webserver.js",
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 0",
     "prepare": "husky install"
