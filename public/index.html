@@ -35,18 +35,21 @@
     const tableY = 300
     const tableX = 300
 
+    // TODO: Check margins in more extreme cases.
+    const plateSize = 30
+    const plateMargin = 40 * (philosophers.length / 3)
+
+    const forkSize = 20
+    const forkMargin = 38 * (philosophers.length / 3)
+
     const chairMargin = 90 * (philosophers.length / 3)
     const chairSize = 40
 
-    // TODO: Check margins in more extreme cases.
-    const plateSize = 20
-    const plateMargin = 50 * (philosophers.length / 3)
-
-    const calcX = (margin, radius) => (d, i) =>
+    const calcX = (margin, radius, i) =>
       tableX +
       (margin + radius) * Math.sin(i * 2 * (Math.PI / philosophers.length))
 
-    const calcY = (margin, radius) => (d, i) =>
+    const calcY = (margin, radius, i) =>
       tableY +
       (margin + radius) * Math.cos(i * 2 * (Math.PI / philosophers.length))
 
@@ -57,8 +60,8 @@
       .data(philosophers)
       .enter()
       .append('circle')
-      .attr('cy', calcY(chairMargin, chairSize))
-      .attr('cx', calcX(chairMargin, chairSize))
+      .attr('cy', (_, i) => calcY(chairMargin, chairSize, i))
+      .attr('cx', (_, i) => calcX(chairMargin, chairSize, i))
       .attr('r', chairSize)
       .attr('fill', 'dodgerblue')
 
@@ -78,8 +81,8 @@
       .data(philosophers)
       .enter()
       .append('circle')
-      .attr('cy', calcY(plateMargin, plateSize))
-      .attr('cx', calcX(plateMargin, plateSize))
+      .attr('cy', (_, i) => calcY(plateMargin, plateSize, i))
+      .attr('cx', (_, i) => calcX(plateMargin, plateSize, i))
       .attr('r', plateSize)
       .attr('fill', 'beige')
 
@@ -91,8 +94,8 @@
       .enter()
       .append('g')
       .append('rect')
-      .attr('x', calcX(plateMargin, plateSize))
-      .attr('y', calcY(plateMargin, plateSize))
+      .attr('x', (_, i) => calcX(forkMargin, plateSize, i))
+      .attr('y', (_, i) => calcY(forkMargin, plateSize, i))
       .attr('width', 9)
       .attr('height', 30)
       .attr(
@@ -100,14 +103,15 @@
         (d, i) =>
           `rotate(${
             (philosophers.length - i) * (360 / philosophers.length)
-          }, ${calcX(plateMargin, plateSize)(d, i)} ${calcY(
-            plateMargin,
-            plateSize
-          )(d, i)})`
+          }, ${calcX(forkMargin, plateSize, i)} ${calcY(
+            forkMargin,
+            plateSize,
+            i
+          )})`
       )
       .attr('fill', 'brown')
 
-    d3.select('.forks').attr('transform', `rotate(-20, ${tableX}, ${tableY})`)
+    d3.select('.forks').attr('transform', `rotate(-35, ${tableX}, ${tableY})`)
     // }
   </script>
 </html>
