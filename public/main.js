@@ -11,10 +11,18 @@ import { createPlates } from './createPlates.js'
 import { createTable } from './createTable.js'
 import { createChairs } from './createChairs.js'
 
-const state = {
+const defaultState = () => ({
   initialized: false,
   philosophers: new Array(5).fill(Status.thinking),
   forks: new Array(5).fill(-1)
+})
+
+const state = defaultState()
+
+const resetState = () => {
+  state.initialized = false
+  state.philosophers = defaultState().philosophers
+  state.forks = defaultState().forks
 }
 
 const updateView = newState => {
@@ -26,12 +34,19 @@ const updateView = newState => {
 }
 
 const main = () => {
-  d3.select('body').attr('width', CANVAS_W).attr('height', CANVAS_H)
-
   // eslint-disable-next-line
   const socket = new WebSocket(SERVER_URL)
 
-  socket.onopen = () => socket.send('start')
+  d3.select('body').attr('width', CANVAS_W).attr('height', CANVAS_H)
+  // eslint-disable-next-line
+  document.querySelector('#start-button').addEventListener('click', () => {
+    socket.send('start')
+  })
+  // eslint-disable-next-line
+  document.querySelector('#stop-button').addEventListener('click', () => {
+    socket.send('stop')
+    resetState()
+  })
 
   socket.onmessage = event => {
     // TODO: Add some error handling here

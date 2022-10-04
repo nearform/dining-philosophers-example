@@ -5,9 +5,10 @@ import { TABLE_X, TABLE_Y } from './constants.js'
 export const createForks = ({ state }) => {
   const forkSize = 20
   const forkMargin = (38 * 5) / 3
+  const pCount = state.philosophers.length
+
   const forks = state.forks.map((fork, idx) => {
     const selectedOffset = fork === -1 ? 0 : 80
-    const pCount = state.philosophers.length
 
     return {
       selected: fork,
@@ -31,8 +32,7 @@ export const createForks = ({ state }) => {
     .attr('width', 9)
     .attr('height', 30)
     .attr('transform', (d, i) => {
-      const angle =
-        (state.philosophers.length - i) * (360 / state.philosophers.length)
+      const angle = (pCount - i) * (360 / pCount)
 
       return `rotate(${angle}, ${d.x} ${d.y})`
     })

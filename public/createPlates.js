@@ -5,6 +5,7 @@ export const createPlates = ({ state }) => {
   const radius = 30
   const margin = (40 * 5) / 3
   const pCount = state.philosophers.length
+
   const plates = state.philosophers.map((_, idx) => ({
     x: calcX(margin, radius, idx, pCount),
     y: calcY(margin, radius, idx, pCount),

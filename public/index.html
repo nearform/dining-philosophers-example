@@ -7,14 +7,21 @@
     <title>Dining philosophers problem</title>
   </head>
   <body>
+    <div>
+      <label for="philosophers-amount">
+        Philosophers count
+        <input id="philosophers-amount" type="number" value="5" />
+      </label>
+      <button id="start-button">Start</button>
+      <button id="stop-button">Stop</button>
+    </div>
+
     <svg width="1200" height="1200">
       <g class="table"></g>
       <g class="chairs"></g>
       <g class="plates"></g>
       <g class="forks"></g>
     </svg>
-
-    <input type="number" />
   </body>
   <script type="module" src="./main.js"></script>
 </html>
