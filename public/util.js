@@ -1,0 +1,18 @@
+import { TABLE_X, TABLE_Y } from './constants.js'
+
+export const calcX = (margin, radius, i, philosophersCount) =>
+  TABLE_X + (margin + radius) * Math.sin(i * 2 * (Math.PI / philosophersCount))
+
+export const calcY = (margin, radius, i, philosophersCount) =>
+  TABLE_Y + (margin + radius) * Math.cos(i * 2 * (Math.PI / philosophersCount))
+
+export const convertStatus = status => {
+  switch (status) {
+    case 0:
+      return 'thinking'
+    case 1:
+      return 'hungry'
+    case 2:
+      return 'eating'
+  }
+}

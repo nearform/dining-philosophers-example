@@ -35,10 +35,11 @@ fastify.register(async function (fastify) {
       const message = msg.toString()
       if (message === 'start') {
         if (state.running) {
-          return sendMessage(Msg.ALREADY_RUNNING)
+          stop()
         }
 
         start()
+        sendMessage(Msg.INIT, { philosophers: state.philosophers })
 
         state.philosophers.forEach(p =>
           p.on('message', payload => {

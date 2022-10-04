@@ -8,7 +8,7 @@ function log(...params) {
 }
 
 function randomDelay() {
-  return Math.floor(Math.random() * 600) + 500
+  return Math.floor(Math.random() * 1000) + 1500
 }
 
 parentPort.on('message', async forks => {
@@ -31,48 +31,66 @@ parentPort.on('message', async forks => {
 
   const UpdateTypes = {
     thinking: 'thinking',
+    hungry: 'hungry',
     eating: 'eating',
-    waitingFork: fork => `waitingFork::${fork}`
+    grabbingFork: `grabbingFork`,
+    freeingForks: `freeingForks`
   }
 
   while (true) {
     const thinkingTime = randomDelay()
     log(`thinking...`)
-
     parentPort.postMessage({
       philosopher,
       updateType: UpdateTypes.thinking
     })
 
     await sleep(thinkingTime)
+
+    parentPort.postMessage({
+      philosopher,
+      updateType: UpdateTypes.hungry
+    })
     log('is hungry')
 
     log('waiting for fork', fork1)
+    waitForFork(fork1)
+    log('got fork', fork1)
+    await sleep(800)
     parentPort.postMessage({
       philosopher,
-      updateType: UpdateTypes.waitingFork(fork1)
+      fork: fork1,
+      updateType: UpdateTypes.grabbingFork
     })
-
-    waitForFork(fork1)
-
-    await sleep(200)
 
     log('waiting for fork', fork2)
+    waitForFork(fork2)
+    log('got fork', fork2)
     parentPort.postMessage({
       philosopher,
-      updateType: UpdateTypes.waitingFork(fork2)
+      fork: fork2,
+      updateType: UpdateTypes.grabbingFork
     })
-    waitForFork(fork2)
 
-    const eatingTime = randomDelay()
     log(`eating...`)
     parentPort.postMessage({
       philosopher,
       updateType: UpdateTypes.eating
     })
+    const eatingTime = randomDelay()
     await sleep(eatingTime)
-    log('finished eating')
+    log(`finished eating, freeing forks: ${fork1} ${fork2}`)
 
     freeForks()
+    parentPort.postMessage({
+      philosopher,
+      fork: fork2,
+      updateType: UpdateTypes.freeingForks
+    })
+    parentPort.postMessage({
+      philosopher,
+      fork: fork1,
+      updateType: UpdateTypes.freeingForks
+    })
   }
 })
