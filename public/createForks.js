@@ -33,16 +33,28 @@ export const createForks = ({ state }) => {
     .attr('height', 30)
     .attr('transform', (d, i) => {
       const angle = (pCount - i) * (360 / pCount)
-
       return `rotate(${angle}, ${d.x} ${d.y})`
     })
+
+  d3.select('.forks')
+    .selectAll('g')
+    .append('text')
+    .attr('x', d => d.x)
+    .attr('y', d => d.y)
+    .text((d, i) => i)
 
   g.attr('transform', (d, i) => {
     if (d.selected === -1) {
       return ''
     }
 
-    const angle = d.selected >= i ? '-22' : '22'
+    let angle
+    console.log(d.selected, pCount, i)
+    if (d.selected === pCount - 1 && i === 0) {
+      angle = '22'
+    } else {
+      angle = d.selected >= i ? '-22' : '22'
+    }
 
     return `rotate(${angle}, ${TABLE_X}, ${TABLE_Y})`
   })

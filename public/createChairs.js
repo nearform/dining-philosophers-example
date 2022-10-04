@@ -29,5 +29,5 @@ export const createChairs = ({ state }) => {
     .attr('y', d => d.y)
     .attr('text-anchor', 'middle')
     .attr('alignment-baseline', 'middle')
-    .text(d => `${convertStatus(d.status)}`)
+    .text((d, i) => `${i} ${convertStatus(d.status)}`)
 }

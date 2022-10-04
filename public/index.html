@@ -7,21 +7,31 @@
     <title>Dining philosophers problem</title>
   </head>
   <body>
-    <div>
-      <label for="philosophers-amount">
-        Philosophers count
-        <input id="philosophers-amount" type="number" value="5" />
-      </label>
-      <button id="start-button">Start</button>
-      <button id="stop-button">Stop</button>
+    <div class="container is-fluid columns is-centered">
+      <div class="column is-half">
+        <label for="philosophers-amount" class="label">
+          Philosophers count
+          <input
+            class="input"
+            id="philosophers-amount"
+            type="number"
+            value="5"
+          />
+        </label>
+        <button class="button is-black" id="start-button">Start</button>
+        <button class="button is-black" id="stop-button">Stop</button>
+        <svg height="900px" width="100%">
+          <g class="table"></g>
+          <g class="chairs"></g>
+          <g class="plates"></g>
+          <g class="forks"></g>
+        </svg>
+      </div>
     </div>
-
-    <svg width="1200" height="1200">
-      <g class="table"></g>
-      <g class="chairs"></g>
-      <g class="plates"></g>
-      <g class="forks"></g>
-    </svg>
   </body>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
+  />
   <script type="module" src="./main.js"></script>
 </html>
