@@ -38,12 +38,12 @@ parentPort.on('message', async forks => {
   }
 
   while (true) {
-    const thinkingTime = randomDelay()
-    log(`thinking...`)
     parentPort.postMessage({
       philosopher,
       updateType: UpdateTypes.thinking
     })
+    const thinkingTime = randomDelay()
+    log(`thinking...`)
 
     await sleep(thinkingTime)
 
@@ -84,12 +84,6 @@ parentPort.on('message', async forks => {
     freeForks()
     parentPort.postMessage({
       philosopher,
-      fork: fork2,
-      updateType: UpdateTypes.freeingForks
-    })
-    parentPort.postMessage({
-      philosopher,
-      fork: fork1,
       updateType: UpdateTypes.freeingForks
     })
   }

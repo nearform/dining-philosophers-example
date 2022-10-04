@@ -25,7 +25,9 @@ export const createChairs = ({ state }) => {
     .attr('fill', 'dodgerblue')
 
   c.append('text')
-    .attr('x', d => d.x - 10)
+    .attr('x', d => d.x)
     .attr('y', d => d.y)
-    .text((d, i) => `${i} \n [${convertStatus(d.status)}]`)
+    .attr('text-anchor', 'middle')
+    .attr('alignment-baseline', 'middle')
+    .text(d => `${convertStatus(d.status)}`)
 }

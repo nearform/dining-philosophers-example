@@ -36,17 +36,16 @@ export const createForks = ({ state }) => {
 
       return `rotate(${angle}, ${d.x} ${d.y})`
     })
-    .attr('fill', 'brown')
 
   g.attr('transform', (d, i) => {
     if (d.selected === -1) {
       return ''
     }
 
-    const angle = d.selected > i ? '-22' : '22'
+    const angle = d.selected >= i ? '-22' : '22'
 
     return `rotate(${angle}, ${TABLE_X}, ${TABLE_Y})`
   })
 
-  d3.select('.forks').attr('transform', `rotate(-34.5, ${TABLE_X}, ${TABLE_Y})`)
+  d3.select('.forks').attr('transform', `rotate(37.5, ${TABLE_X}, ${TABLE_Y})`)
 }
