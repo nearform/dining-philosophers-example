@@ -1,8 +1,5 @@
 import { Worker } from 'node:worker_threads'
 
-// TODO: Should we even have a default here?
-const defaultNumberOfPhilosophers = 5
-
 export const createSimulation = () => {
   const state = {
     forks: undefined,
@@ -10,14 +7,13 @@ export const createSimulation = () => {
     running: false
   }
 
-  const start = (numberOfPhilosophers = defaultNumberOfPhilosophers) => {
-    const buffer = new SharedArrayBuffer(
-      numberOfPhilosophers * Int32Array.BYTES_PER_ELEMENT
-    )
+  const start = (numberOfPhilosophers = 5) => {
+    const num = +numberOfPhilosophers
+    const buffer = new SharedArrayBuffer(num * Int32Array.BYTES_PER_ELEMENT)
 
     state.forks = new Int32Array(buffer)
 
-    state.philosophers = Array(numberOfPhilosophers)
+    state.philosophers = Array(num)
       .fill(null)
       .map(
         (_, philosopher, { length }) =>

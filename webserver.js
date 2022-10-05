@@ -32,14 +32,13 @@ fastify.register(async function (fastify) {
     }
 
     connection.socket.on('message', msg => {
-      const message = msg.toString()
-      if (message === 'start') {
+      const message = JSON.parse(msg.toString())
+
+      if (message.type === 'start') {
         if (state.running) {
           stop()
         }
-
-        start()
-        sendMessage(Msg.INIT, { philosophers: state.philosophers })
+        start(message.philosophersCount)
 
         state.philosophers.forEach(p =>
           p.on('message', payload => {
@@ -49,7 +48,7 @@ fastify.register(async function (fastify) {
         sendMessage(Msg.STARTED)
       }
 
-      if (message === 'stop') {
+      if (message.type === 'stop') {
         if (!state.running) {
           return sendMessage(Msg.ALREADY_STOPPED)
         }

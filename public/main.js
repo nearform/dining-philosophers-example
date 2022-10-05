@@ -1,68 +1,49 @@
-import * as d3 from 'https://cdn.skypack.dev/d3@7'
-import {
-  Status,
-  UpdateType,
-  CANVAS_H,
-  CANVAS_W,
-  SERVER_URL
-} from './constants.js'
+import { Status, UpdateType, SERVER_URL } from './constants.js'
 import { createForks } from './createForks.js'
 import { createPlates } from './createPlates.js'
 import { createTable } from './createTable.js'
 import { createChairs } from './createChairs.js'
 
-const defaultState = () => ({
-  running: false,
-  philosophers: new Array(5).fill(Status.thinking),
-  forks: new Array(5).fill(-1)
+const defaultState = (count = 5) => ({
+  philosophers: new Array(count).fill(Status.thinking),
+  forks: new Array(count).fill(-1)
 })
 
 const state = defaultState()
 
-const updateView = newState => {
-  createTable()
-  createForks({ state, newState })
-  createChairs({ state, newState })
-  createPlates({ state, newState })
-}
-
-const resetState = () => {
-  state.running = false
-  state.philosophers = defaultState().philosophers
-  state.forks = defaultState().forks
-  // updateView(state)
+const updateView = () => {
+  createTable({ state })
+  createForks({ state })
+  createChairs({ state })
+  createPlates({ state })
 }
 
 const main = async () => {
-  // eslint-disable-next-line
   const socket = new WebSocket(SERVER_URL)
   const queue = []
 
-  d3.select('body').attr('width', CANVAS_W).attr('height', CANVAS_H)
-  // eslint-disable-next-line
+  const resetState = count => {
+    state.philosophers = defaultState(count).philosophers
+    state.forks = defaultState(count).forks
+    queue.length = 0
+    updateView(state)
+  }
+
   document.querySelector('#start-button').addEventListener('click', () => {
-    socket.send('start')
+    socket.send(JSON.stringify({ type: 'start' }))
+    resetState()
   })
 
-  // TODO: Implement pause/stop server side
-  // document.querySelector('#start-button').addEventListener('click', () => {
-  //   socket.send('pause')
-  // })
-
-  // eslint-disable-next-line
   document.querySelector('#stop-button').addEventListener('click', () => {
-    socket.send('stop')
+    socket.send(JSON.stringify({ type: 'stop' }))
     resetState()
-    queue.length = 0
   })
 
   socket.onmessage = event => {
-    // TODO: Add some error handling here
     queue.push(event)
   }
 
   const parse = event => {
-    // TODO: Add some error handling here
     const message = JSON.parse(event.data)
 
     const { philosopher, fork, updateType } = message.payload || {}
@@ -99,32 +80,25 @@ const main = async () => {
         console.error('Invalid update type', updateType)
     }
 
-    // console.table({
-    //   payload: message.payload,
-    //   forks: state.forks,
-    //   phi: state.philosophers.map(f => {
-    //     switch (f) {
-    //       case 0:
-    //         return 'thinking'
-    //       case 1:
-    //         return 'hungry'
-    //       case 2:
-    //         return 'eating'
-    //     }
-    //   })
-    // })
-
     updateView(state)
   }
 
+  const sleep = interval => new Promise(r => setTimeout(r, interval))
+
   while (true) {
     const event = queue.shift()
+
+    if (state.paused) {
+      await sleep(100)
+      return
+    }
+
     if (event) {
-      // console.log('Parsing msg', event.data)
       parse(event)
-      await new Promise(r => setTimeout(r, 400))
+
+      await sleep(200)
     } else {
-      await new Promise(r => setTimeout(r, 100))
+      await sleep(100)
     }
   }
 }

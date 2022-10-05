@@ -8,7 +8,7 @@ function log(...params) {
 }
 
 function randomDelay() {
-  return Math.floor(Math.random() * 1000) + 1500
+  return Math.floor(Math.random() * 1200) + 1000
 }
 
 parentPort.on('message', async forks => {
@@ -77,10 +77,11 @@ parentPort.on('message', async forks => {
       philosopher,
       updateType: UpdateTypes.eating
     })
+
     const eatingTime = randomDelay()
     await sleep(eatingTime)
-    log(`finished eating, freeing forks: ${fork1} ${fork2}`)
 
+    log(`finished eating, freeing forks: ${fork1} ${fork2}`)
     freeForks()
     parentPort.postMessage({
       philosopher,

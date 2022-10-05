@@ -1,8 +1,9 @@
 import * as d3 from 'https://cdn.skypack.dev/d3@7'
-import { TABLE_X, TABLE_Y } from './constants.js'
+import { TABLE_RADIUS, TABLE_X, TABLE_Y } from './constants.js'
 
-export const createTable = () => {
-  const tableRadius = (80 * 5) / 3
+export const createTable = ({ state }) => {
+  const pCount = state.philosophers.length
+  const tableRadius = (TABLE_RADIUS * pCount) / 3
 
   d3.select('.table').selectAll('circle').remove()
 
@@ -11,5 +12,5 @@ export const createTable = () => {
     .attr('cy', TABLE_Y)
     .attr('cx', TABLE_X)
     .attr('r', tableRadius)
-    .attr('fill', 'tomato')
+    .attr('fill', 'cadetblue')
 }

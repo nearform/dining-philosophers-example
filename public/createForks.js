@@ -1,14 +1,14 @@
 import * as d3 from 'https://cdn.skypack.dev/d3@7'
 import { calcX, calcY } from './util.js'
-import { TABLE_X, TABLE_Y } from './constants.js'
+import { TABLE_RADIUS, TABLE_X, TABLE_Y } from './constants.js'
 
 export const createForks = ({ state }) => {
-  const forkSize = 20
-  const forkMargin = (38 * 5) / 3
   const pCount = state.philosophers.length
+  const forkSize = 20
+  const forkMargin = (TABLE_RADIUS / 2) * (pCount / 3)
 
   const forks = state.forks.map((fork, idx) => {
-    const selectedOffset = fork === -1 ? 0 : 80
+    const selectedOffset = fork === -1 ? 0 : TABLE_RADIUS
 
     return {
       selected: fork,
@@ -36,24 +36,17 @@ export const createForks = ({ state }) => {
       return `rotate(${angle}, ${d.x} ${d.y})`
     })
 
-  d3.select('.forks')
-    .selectAll('g')
-    .append('text')
-    .attr('x', d => d.x)
-    .attr('y', d => d.y)
-    .text((d, i) => i)
-
   g.attr('transform', (d, i) => {
     if (d.selected === -1) {
       return ''
     }
 
+    const selectedForkOffset = 22
     let angle
-    console.log(d.selected, pCount, i)
     if (d.selected === pCount - 1 && i === 0) {
-      angle = '22'
+      angle = selectedForkOffset
     } else {
-      angle = d.selected >= i ? '-22' : '22'
+      angle = d.selected >= i ? `-${selectedForkOffset}` : selectedForkOffset
     }
 
     return `rotate(${angle}, ${TABLE_X}, ${TABLE_Y})`
