@@ -8,7 +8,12 @@ function log(...params) {
 }
 
 function randomDelay() {
-  return Math.floor(Math.random() * 1200) + 1000
+  const BASE_DELAY_DURATION = 1000
+  const VARIABLE_DELAY_DURATION_MULTIPLIER = 1200
+  return (
+    Math.floor(Math.random() * VARIABLE_DELAY_DURATION_MULTIPLIER) +
+    BASE_DELAY_DURATION
+  )
 }
 
 parentPort.on('message', async forks => {
