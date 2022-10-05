@@ -12,7 +12,6 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 fastify
   .register(fastifyWs)
-  // TODO: fix / not redirecting to /index.html
   .register(fastifyStatic, { root: path.join(__dirname, 'public') })
 
 const Msg = {
