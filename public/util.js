@@ -1,10 +1,10 @@
-import { TABLE_X, TABLE_Y } from './constants.js'
+import { PHILOSOPHERS_COUNT, TABLE_X, TABLE_Y } from './constants.js'
 
-export const calcX = (margin, radius, i, philosophersCount) =>
-  TABLE_X + (margin + radius) * Math.sin(i * 2 * (Math.PI / philosophersCount))
+export const calcX = (margin, radius, i) =>
+  TABLE_X + (margin + radius) * Math.sin(i * 2 * (Math.PI / PHILOSOPHERS_COUNT))
 
-export const calcY = (margin, radius, i, philosophersCount) =>
-  TABLE_Y + (margin + radius) * Math.cos(i * 2 * (Math.PI / philosophersCount))
+export const calcY = (margin, radius, i) =>
+  TABLE_Y + (margin + radius) * Math.cos(i * 2 * (Math.PI / PHILOSOPHERS_COUNT))
 
 export const convertStatus = status => {
   switch (status) {

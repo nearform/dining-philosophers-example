@@ -26,7 +26,7 @@ const Msg = {
 const { start, stop, state } = createSimulation()
 
 fastify.register(async function (fastify) {
-  fastify.get('/', { websocket: true }, connection => {
+  fastify.get('/ws', { websocket: true }, connection => {
     const sendMessage = (eventType, payload) => {
       connection.socket.send(JSON.stringify({ type: eventType, payload }))
     }
@@ -60,8 +60,8 @@ fastify.register(async function (fastify) {
 })
 
 try {
-  await fastify.listen({ port: 3000 })
-  console.log('Listening on port 3000')
+  const address = await fastify.listen({ port: 3000 })
+  console.log(`Server running on: ${address}`)
 } catch (err) {
   if (err) {
     fastify.log.error(err)
