@@ -5,8 +5,10 @@ import { createTable } from './createTable.js'
 import { createChairs } from './createChairs.js'
 
 const defaultState = (count = 5) => ({
+  paused: false,
   philosophers: new Array(count).fill(Status.thinking),
-  forks: new Array(count).fill(-1)
+  forks: new Array(count).fill(-1),
+  queue: []
 })
 
 const state = defaultState()
@@ -18,29 +20,67 @@ const updateView = () => {
   createPlates({ state })
 }
 
-const main = async () => {
-  const socket = new WebSocket(SERVER_URL)
-  const queue = []
+const resetState = () => {
+  const count = +el.philosophersCountInput.value
+  Object.assign(state, defaultState(count))
+  updateView()
+}
 
-  const resetState = count => {
-    state.philosophers = defaultState(count).philosophers
-    state.forks = defaultState(count).forks
-    queue.length = 0
-    updateView(state)
+const el = {
+  pauseButton: document.querySelector('#pause-button'),
+  startButton: document.querySelector('#start-button'),
+  stopButton: document.querySelector('#stop-button'),
+  philosophersCountInput: document.querySelector('#philosophers-count')
+}
+
+const validateInput = () => {
+  const count = +el.philosophersCountInput.value
+
+  if (isNaN(count) || count < 3 || count > 8) {
+    alert('Philosophers count must be a number betwen 3 and 8')
+    el.philosophersCountInput.value = 5
+    return false
   }
 
-  document.querySelector('#start-button').addEventListener('click', () => {
-    socket.send(JSON.stringify({ type: 'start' }))
+  return true
+}
+
+const addEventListeners = socket => {
+  el.philosophersCountInput.addEventListener('change', () => {
+    validateInput()
     resetState()
   })
 
-  document.querySelector('#stop-button').addEventListener('click', () => {
+  el.pauseButton.addEventListener('click', () => {
+    state.paused = !state.paused
+    el.pauseButton.textContent = state.paused ? 'Resume' : 'Paused'
+  })
+
+  el.startButton.addEventListener('click', () => {
+    const count = +el.philosophersCountInput.value
+
+    if (isNaN(count) || count < 3 || count > 8) {
+      alert('Philosophers count must be a number betwen 3 and 8')
+      return
+    }
+
+    socket.send(JSON.stringify({ type: 'start', philosophersCount: count }))
+    resetState()
+  })
+
+  el.stopButton.addEventListener('click', () => {
     socket.send(JSON.stringify({ type: 'stop' }))
     resetState()
   })
+}
+
+const main = async () => {
+  const socket = new WebSocket(SERVER_URL)
+  addEventListeners(socket)
+  updateView()
 
   socket.onmessage = event => {
-    queue.push(event)
+    state.queue.push(event)
   }
 
   const parse = event => {
@@ -85,20 +125,22 @@ const main = async () => {
 
   const sleep = interval => new Promise(r => setTimeout(r, interval))
 
-  while (true) {
-    const event = queue.shift()
+  const SIMULATION_SPEED = 200
 
+  while (true) {
     if (state.paused) {
-      await sleep(100)
-      return
+      await sleep(SIMULATION_SPEED)
+      continue
     }
+
+    const event = state.queue.shift()
 
     if (event) {
       parse(event)
 
-      await sleep(200)
+      await sleep(SIMULATION_SPEED)
     } else {
-      await sleep(100)
+      await sleep(SIMULATION_SPEED)
     }
   }
 }

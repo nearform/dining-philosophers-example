@@ -16,12 +16,13 @@ export const createChairs = ({ state }) => {
   d3.select('.chairs').selectAll('circle').remove()
   d3.select('.chairs').selectAll('text').remove()
 
-  const c = d3.select('.chairs').selectAll('circle').data(chairs).enter()
   const Colors = {
     thinking: 'lightblue',
     hungry: 'indianred',
     eating: 'darkseagreen'
   }
+
+  const c = d3.select('.chairs').selectAll('circle').data(chairs).enter()
 
   c.append('circle')
     .attr('cx', d => d.x)

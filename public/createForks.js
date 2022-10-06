@@ -12,8 +12,8 @@ export const createForks = ({ state }) => {
 
     return {
       selected: fork,
-      x: calcX(forkMargin + selectedOffset, forkSize, idx),
-      y: calcY(forkMargin + selectedOffset, forkSize, idx)
+      x: calcX(forkMargin + selectedOffset, forkSize, idx, pCount),
+      y: calcY(forkMargin + selectedOffset, forkSize, idx, pCount)
     }
   })
 
@@ -27,11 +27,12 @@ export const createForks = ({ state }) => {
     .append('g')
 
   g.append('rect')
-    .attr('x', d => d.x)
+    .attr('x', d => d.x - 4.5)
     .attr('y', d => d.y)
     .attr('width', 9)
     .attr('height', 30)
     .attr('transform', (d, i) => {
+      // Local rotation so forks point to center of the circle
       const angle = (pCount - i) * (360 / pCount)
       return `rotate(${angle}, ${d.x} ${d.y})`
     })
@@ -41,19 +42,26 @@ export const createForks = ({ state }) => {
       return ''
     }
 
-    const selectedForkAngleOffset = 22
+    const clampMin = (num, min = 0) => (num < min ? min : num)
+
+    const angleFactor = 3 + clampMin(pCount - 4) * 0.5
+    console.log(angleFactor)
+    const selectedForkAngleOffset = 360 / pCount / angleFactor
+
     let angle
     if (d.selected === pCount - 1 && i === 0) {
       angle = selectedForkAngleOffset
     } else {
-      angle =
-        d.selected >= i
-          ? `-${selectedForkAngleOffset}`
-          : selectedForkAngleOffset
+      angle = `${d.selected >= i ? '-' : ''}${selectedForkAngleOffset}`
     }
 
     return `rotate(${angle}, ${TABLE_X}, ${TABLE_Y})`
   })
 
-  d3.select('.forks').attr('transform', `rotate(37.5, ${TABLE_X}, ${TABLE_Y})`)
+  const angle = 360 / pCount / 2
+
+  d3.select('.forks').attr(
+    'transform',
+    `rotate(${angle}, ${TABLE_X}, ${TABLE_Y})`
+  )
 }

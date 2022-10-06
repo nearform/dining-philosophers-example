@@ -15,27 +15,31 @@ export const createSimulation = () => {
 
     state.philosophers = Array(num)
       .fill(null)
-      .map(
-        (_, philosopher, { length }) =>
-          new Worker('./philosopher.js', {
-            workerData: {
-              philosopher,
-              // resource hierarchy logic
-              fork1: philosopher < length - 1 ? philosopher : 0,
-              fork2: philosopher < length - 1 ? philosopher + 1 : philosopher
-            }
-          })
-      )
+      .map((_, philosopher, { length }) => {
+        const p = new Worker('./philosopher.js', {
+          workerData: {
+            philosopher,
+            // resource hierarchy logic
+            fork1: philosopher < length - 1 ? philosopher : 0,
+            fork2: philosopher < length - 1 ? philosopher + 1 : philosopher
+          }
+        })
 
-    state.philosophers.forEach(p => p.postMessage(state.forks))
+        p.postMessage(state.forks)
+
+        return p
+      })
+
     state.running = true
   }
 
   const stop = () => {
     state.philosophers.forEach(p => p.terminate())
-    state.forks = undefined
-    state.philosophers = undefined
-    state.running = false
+    Object.assign(state, {
+      forks: undefined,
+      philosophers: undefined,
+      running: false
+    })
   }
 
   return { stop, start, state }

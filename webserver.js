@@ -44,6 +44,8 @@ fastify.register(async function (fastify) {
             sendMessage(Msg.UPDATED, payload)
           })
         )
+
+        console.log('Starting simulation')
         sendMessage(Msg.STARTED)
       }
 
@@ -52,6 +54,7 @@ fastify.register(async function (fastify) {
           return sendMessage(Msg.ALREADY_STOPPED)
         }
         stop()
+        console.log('Stopping simulation')
         sendMessage(Msg.STOPPED)
       }
     })
