@@ -16,3 +16,5 @@ export const convertStatus = status => {
       return 'eating'
   }
 }
+
+export const sleep = interval => new Promise(r => setTimeout(r, interval))

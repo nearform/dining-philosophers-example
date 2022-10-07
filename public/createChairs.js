@@ -1,7 +1,7 @@
 import * as d3 from 'https://cdn.skypack.dev/d3@7'
 import { convertStatus, calcX, calcY } from './util.js'
 
-export const createChairs = ({ state }) => {
+export const createChairs = state => {
   const pCount = state.philosophers.length
 
   const radius = 40

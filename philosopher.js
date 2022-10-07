@@ -17,14 +17,13 @@ function randomDelay() {
 }
 
 parentPort.on('message', async forks => {
-  function waitForFork(index) {
-    while (true) {
-      Atomics.wait(forks, index, 1)
-
-      if (Atomics.compareExchange(forks, index, 0, 1) === 0) {
-        break
-      }
+  function tryGetFork(index) {
+    if (Atomics.compareExchange(forks, index, 0, 1) === 0) {
+      return
     }
+
+    Atomics.wait(forks, index, 1)
+    tryGetFork(index)
   }
 
   function freeForks() {
@@ -59,7 +58,7 @@ parentPort.on('message', async forks => {
     log('is hungry')
 
     log('waiting for fork', fork1)
-    waitForFork(fork1)
+    tryGetFork(fork1)
     log('got fork', fork1)
     await sleep(800)
     parentPort.postMessage({
@@ -69,7 +68,7 @@ parentPort.on('message', async forks => {
     })
 
     log('waiting for fork', fork2)
-    waitForFork(fork2)
+    tryGetFork(fork2)
     log('got fork', fork2)
     parentPort.postMessage({
       philosopher,

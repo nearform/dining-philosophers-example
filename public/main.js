@@ -1,147 +1,138 @@
-import { Status, UpdateType, SERVER_URL } from './constants.js'
+import {
+  Status,
+  UpdateType,
+  SERVER_URL,
+  DEFAULT_PHILOSOPHERS_COUNT,
+  SIMULATION_SPEED
+} from './constants.js'
 import { createForks } from './createForks.js'
 import { createPlates } from './createPlates.js'
 import { createTable } from './createTable.js'
 import { createChairs } from './createChairs.js'
+import { sleep } from './util.js'
 
-const defaultState = (count = 5) => ({
-  paused: false,
+const startButton = document.querySelector('#start-button')
+const resetButton = document.querySelector('#reset-button')
+const philosophersInput = document.querySelector('#philosophers-count')
+
+const defaultState = (count = DEFAULT_PHILOSOPHERS_COUNT) => ({
+  stopped: true,
   philosophers: new Array(count).fill(Status.thinking),
   forks: new Array(count).fill(-1),
   queue: []
 })
 
-const state = defaultState()
-
-const updateView = () => {
-  createTable({ state })
-  createForks({ state })
-  createChairs({ state })
-  createPlates({ state })
+const updateView = state => {
+  createTable(state)
+  createForks(state)
+  createChairs(state)
+  createPlates(state)
 }
 
-const resetState = () => {
-  const count = +el.philosophersCountInput.value
+const resetState = state => {
+  const count = +philosophersInput.value
   Object.assign(state, defaultState(count))
-  updateView()
-}
-
-const el = {
-  pauseButton: document.querySelector('#pause-button'),
-  startButton: document.querySelector('#start-button'),
-  stopButton: document.querySelector('#stop-button'),
-  philosophersCountInput: document.querySelector('#philosophers-count')
+  updateView(state)
 }
 
 const validateInput = () => {
-  const count = +el.philosophersCountInput.value
+  const count = +philosophersInput.value
 
   if (isNaN(count) || count < 3 || count > 8) {
-    alert('Philosophers count must be a number betwen 3 and 8')
-    el.philosophersCountInput.value = 5
-    return false
+    alert('Philosophers count must be a number between 3 and 8')
+    philosophersInput.value = DEFAULT_PHILOSOPHERS_COUNT
   }
-
-  return true
 }
 
-const addEventListeners = socket => {
-  el.philosophersCountInput.addEventListener('change', () => {
+const addEventListeners = (socket, state) => {
+  philosophersInput.addEventListener('change', () => {
     validateInput()
-    resetState()
+    resetState(state)
   })
 
-  el.pauseButton.addEventListener('click', () => {
-    state.paused = !state.paused
-    el.pauseButton.textContent = state.paused ? 'Resume' : 'Paused'
+  startButton.addEventListener('click', function () {
+    state.stopped = !state.stopped
+    this.textContent = state.stopped ? 'Start' : 'Stop'
+    philosophersInput.disabled = !state.stopped
+    resetButton.disabled = !state.stopped
+
+    socket.send(
+      JSON.stringify(
+        state.stopped
+          ? {
+              type: 'stop'
+            }
+          : {
+              type: 'start',
+              philosophersCount: state.philosophers.length
+            }
+      )
+    )
   })
 
-  el.startButton.addEventListener('click', () => {
-    const count = +el.philosophersCountInput.value
-
-    if (isNaN(count) || count < 3 || count > 8) {
-      alert('Philosophers count must be a number betwen 3 and 8')
-      return
-    }
-
-    socket.send(JSON.stringify({ type: 'start', philosophersCount: count }))
-    resetState()
+  resetButton.addEventListener('click', () => {
+    resetState(state)
   })
+}
 
-  el.stopButton.addEventListener('click', () => {
-    socket.send(JSON.stringify({ type: 'stop' }))
-    resetState()
-  })
+const parse = (event, state) => {
+  const message = JSON.parse(event.data)
+
+  const { philosopher, fork, updateType } = message.payload || {}
+
+  if (!updateType) {
+    return
+  }
+
+  switch (updateType) {
+    case UpdateType.thinking:
+      state.philosophers[philosopher] = Status.thinking
+      break
+    case UpdateType.hungry:
+      state.philosophers[philosopher] = Status.hungry
+      break
+    case UpdateType.eating:
+      state.philosophers[philosopher] = Status.eating
+      break
+    case UpdateType.freeingForks:
+      for (const [idx, fork] of state.forks.entries()) {
+        if (fork === philosopher) {
+          state.forks[idx] = -1
+        }
+      }
+      state.philosophers[philosopher] = Status.thinking
+      break
+    case UpdateType.grabbingFork:
+      state.forks[fork] = philosopher
+      if (state.forks.filter(p => p === philosopher).length === 2) {
+        state.philosophers[philosopher] = Status.eating
+      }
+      break
+    default:
+      console.error('Invalid update type', updateType)
+  }
+
+  updateView(state)
 }
 
 const main = async () => {
+  const state = defaultState()
   const socket = new WebSocket(SERVER_URL)
-  addEventListeners(socket)
-  updateView()
+  addEventListeners(socket, state)
+  updateView(state)
 
-  socket.onmessage = event => {
-    state.queue.push(event)
-  }
-
-  const parse = event => {
-    const message = JSON.parse(event.data)
-
-    const { philosopher, fork, updateType } = message.payload || {}
-
-    if (!updateType) {
-      return
-    }
-
-    switch (updateType) {
-      case UpdateType.thinking:
-        state.philosophers[philosopher] = Status.thinking
-        break
-      case UpdateType.hungry:
-        state.philosophers[philosopher] = Status.hungry
-        break
-      case UpdateType.eating:
-        state.philosophers[philosopher] = Status.eating
-        break
-      case UpdateType.freeingForks:
-        for (const [idx, fork] of state.forks.entries()) {
-          if (fork === philosopher) {
-            state.forks[idx] = -1
-          }
-        }
-        state.philosophers[philosopher] = Status.thinking
-        break
-      case UpdateType.grabbingFork:
-        state.forks[fork] = philosopher
-        if (state.forks.filter(p => p === philosopher).length === 2) {
-          state.philosophers[philosopher] = Status.eating
-        }
-        break
-      default:
-        console.error('Invalid update type', updateType)
-    }
-
-    updateView(state)
-  }
-
-  const sleep = interval => new Promise(r => setTimeout(r, interval))
-
-  const SIMULATION_SPEED = 200
+  socket.onmessage = event => state.queue.push(event)
 
   while (true) {
-    if (state.paused) {
-      await sleep(SIMULATION_SPEED)
-      continue
+    if (!state.stopped) {
+      const event = state.queue.shift()
+
+      if (event) {
+        parse(event, state)
+      }
     }
 
-    const event = state.queue.shift()
-
-    if (event) {
-      parse(event)
-
-      await sleep(SIMULATION_SPEED)
-    } else {
-      await sleep(SIMULATION_SPEED)
-    }
+    await sleep(SIMULATION_SPEED)
   }
 }
 

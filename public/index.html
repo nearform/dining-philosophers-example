@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dining philosophers problem</title>
+    <title>Dining philosophers example</title>
   </head>
   <body>
     <div class="container is-fluid columns is-centered">
@@ -12,7 +12,7 @@
         <div class="columns is-centered">
           <div class="column is-half">
             <label class="label">
-              Philosophers count
+              Number of philosophers
               <input
                 class="input"
                 type="number"
@@ -23,18 +23,13 @@
               />
             </label>
             <div class="columns">
-              <div class="column is-4">
+              <div class="column is-6">
                 <button class="button is-fullwidth is-black" id="start-button">
                   Start
                 </button>
               </div>
-              <div class="column is-4">
-                <button class="button is-fullwidth is-black" id="pause-button">
-                  Pause
-                </button>
-              </div>
-              <div class="column is-4">
-                <button class="button is-fullwidth is-black" id="stop-button">
+              <div class="column is-6">
+                <button class="button is-fullwidth is-black" id="reset-button">
                   Reset
                 </button>
               </div>
@@ -42,7 +37,7 @@
           </div>
         </div>
         <div class="columns">
-          <svg height="900px" width="100%" viewBox="0 0 800 1500">
+          <svg viewBox="0 0 800 600">
             <g class="table"></g>
             <g class="chairs"></g>
             <g class="plates"></g>

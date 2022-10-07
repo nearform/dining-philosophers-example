@@ -2,7 +2,7 @@ import * as d3 from 'https://cdn.skypack.dev/d3@7'
 import { calcX, calcY } from './util.js'
 import { TABLE_X, TABLE_Y } from './constants.js'
 
-export const createForks = ({ state }) => {
+export const createForks = state => {
   const pCount = state.philosophers.length
   const forkSize = 20
   const forkMargin = 70
@@ -45,7 +45,6 @@ export const createForks = ({ state }) => {
     const clampMin = (num, min = 0) => (num < min ? min : num)
 
     const angleFactor = 3 + clampMin(pCount - 4) * 0.5
-    console.log(angleFactor)
     const selectedForkAngleOffset = 360 / pCount / angleFactor
 
     let angle

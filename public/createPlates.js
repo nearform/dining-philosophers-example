@@ -1,7 +1,7 @@
 import * as d3 from 'https://cdn.skypack.dev/d3@7'
 import { calcX, calcY } from './util.js'
 
-export const createPlates = ({ state }) => {
+export const createPlates = state => {
   const pCount = state.philosophers.length
   const plateRadius = 30
   const margin = 80
