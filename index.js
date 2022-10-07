@@ -1,25 +1,46 @@
 import { Worker } from 'node:worker_threads'
 
-const numberOfPhilosophers = 5
+export const createSimulation = () => {
+  const state = {
+    forks: undefined,
+    philosophers: undefined,
+    running: false
+  }
 
-const buffer = new SharedArrayBuffer(
-  numberOfPhilosophers * Int32Array.BYTES_PER_ELEMENT
-)
+  const start = (numberOfPhilosophers = 5) => {
+    const num = +numberOfPhilosophers
+    const buffer = new SharedArrayBuffer(num * Int32Array.BYTES_PER_ELEMENT)
 
-const forks = new Int32Array(buffer)
+    state.forks = new Int32Array(buffer)
 
-const philosophers = Array(numberOfPhilosophers)
-  .fill(null)
-  .map(
-    (_, philosopher, { length }) =>
-      new Worker('./philosopher.js', {
-        workerData: {
-          philosopher,
-          // resource hierarchy logic
-          fork1: philosopher < length - 1 ? philosopher : 0,
-          fork2: philosopher < length - 1 ? philosopher + 1 : philosopher
-        }
+    state.philosophers = Array(num)
+      .fill(null)
+      .map((_, philosopher, { length }) => {
+        const p = new Worker('./philosopher.js', {
+          workerData: {
+            philosopher,
+            // resource hierarchy logic
+            fork1: philosopher < length - 1 ? philosopher : 0,
+            fork2: philosopher < length - 1 ? philosopher + 1 : philosopher
+          }
+        })
+
+        p.postMessage(state.forks)
+
+        return p
       })
-  )
 
-philosophers.forEach(p => p.postMessage(forks))
+    state.running = true
+  }
+
+  const stop = () => {
+    state.philosophers.forEach(p => p.terminate())
+    Object.assign(state, {
+      forks: undefined,
+      philosophers: undefined,
+      running: false
+    })
+  }
+
+  return { stop, start, state }
+}

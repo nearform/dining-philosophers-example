@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dining philosophers example</title>
+  </head>
+  <body>
+    <div class="container is-fluid columns is-centered">
+      <div class="column is-half-fullhd mt-2">
+        <div class="columns is-centered">
+          <div class="column is-half">
+            <label class="label">
+              Number of philosophers
+              <input
+                class="input"
+                type="number"
+                value="5"
+                max="8"
+                min="3"
+                id="philosophers-count"
+              />
+            </label>
+            <div class="columns">
+              <div class="column is-6">
+                <button class="button is-fullwidth is-black" id="start-button">
+                  Start
+                </button>
+              </div>
+              <div class="column is-6">
+                <button class="button is-fullwidth is-black" id="reset-button">
+                  Reset
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="columns">
+          <svg viewBox="0 0 800 600">
+            <g class="table"></g>
+            <g class="chairs"></g>
+            <g class="plates"></g>
+            <g class="forks"></g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </body>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
+  />
+  <script type="module" src="./main.js"></script>
+</html>
