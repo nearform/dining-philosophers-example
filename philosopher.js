@@ -1,19 +1,15 @@
 import { workerData, parentPort } from 'node:worker_threads'
 import { setTimeout as sleep } from 'node:timers/promises'
 
+import { UpdateType } from './public/constants.js'
+
 const { philosopher, fork1, fork2 } = workerData
 
-function log(...params) {
-  console.log(`philosopher ${philosopher}:`, ...params)
-}
-
 function randomDelay() {
-  const BASE_DELAY_DURATION = 1000
-  const VARIABLE_DELAY_DURATION_MULTIPLIER = 1200
-  return (
-    Math.floor(Math.random() * VARIABLE_DELAY_DURATION_MULTIPLIER) +
-    BASE_DELAY_DURATION
-  )
+  const BASE_DELAY = 1000
+  const DELAY_MULTIPLIER = 1200
+
+  return Math.floor(Math.random() * DELAY_MULTIPLIER) + BASE_DELAY
 }
 
 parentPort.on('message', async forks => {
@@ -33,63 +29,52 @@ parentPort.on('message', async forks => {
     Atomics.notify(forks, fork2)
   }
 
-  const UpdateTypes = {
-    thinking: 'thinking',
-    hungry: 'hungry',
-    eating: 'eating',
-    grabbingFork: `grabbingFork`,
-    freeingForks: `freeingForks`
-  }
-
   while (true) {
     parentPort.postMessage({
       philosopher,
-      updateType: UpdateTypes.thinking
+      updateType: UpdateType.thinking
     })
     const thinkingTime = randomDelay()
-    log(`thinking...`)
 
     await sleep(thinkingTime)
 
     parentPort.postMessage({
       philosopher,
-      updateType: UpdateTypes.hungry
+      updateType: UpdateType.hungry
     })
-    log('is hungry')
 
-    log('waiting for fork', fork1)
     tryGetFork(fork1)
-    log('got fork', fork1)
+
     await sleep(800)
+
     parentPort.postMessage({
       philosopher,
-      fork: fork1,
-      updateType: UpdateTypes.grabbingFork
+      updateType: UpdateType.grabbingFork,
+      fork: fork1
     })
 
-    log('waiting for fork', fork2)
     tryGetFork(fork2)
-    log('got fork', fork2)
+
     parentPort.postMessage({
       philosopher,
-      fork: fork2,
-      updateType: UpdateTypes.grabbingFork
+      updateType: UpdateType.grabbingFork,
+      fork: fork2
     })
 
-    log(`eating...`)
     parentPort.postMessage({
       philosopher,
-      updateType: UpdateTypes.eating
+      updateType: UpdateType.eating
     })
 
     const eatingTime = randomDelay()
     await sleep(eatingTime)
 
-    log(`finished eating, freeing forks: ${fork1} ${fork2}`)
     freeForks()
+
     parentPort.postMessage({
       philosopher,
-      updateType: UpdateTypes.freeingForks
+      updateType: UpdateType.freeingForks,
+      forks: { fork1, fork2 }
     })
   }
 })

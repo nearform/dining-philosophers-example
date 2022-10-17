@@ -8,8 +8,8 @@ export const UpdateType = {
   thinking: 'thinking',
   hungry: 'hungry',
   eating: 'eating',
-  grabbingFork: `grabbingFork`,
-  freeingForks: `freeingForks`
+  grabbingFork: 'grabbingFork',
+  freeingForks: 'freeingForks'
 }
 
 export const Status = {
