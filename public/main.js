@@ -78,11 +78,7 @@ const addEventListeners = (socket, state) => {
 const parse = (event, state) => {
   const message = JSON.parse(event.data)
 
-  const { philosopher, fork, updateType } = message.payload || {}
-
-  if (!updateType) {
-    return
-  }
+  const { philosopher, fork, updateType } = message || {}
 
   switch (updateType) {
     case UpdateType.thinking:
@@ -109,7 +105,7 @@ const parse = (event, state) => {
       }
       break
     default:
-      console.error('Invalid update type', updateType)
+      console.error('Invalid update type:', updateType)
   }
 
   updateView(state)

@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node webserver.js",
+    "web": "node web.js",
+    "cli": "node cli.js",
     "lint": "eslint .",
     "prepare": "husky install"
   },
@@ -36,6 +37,7 @@
   "dependencies": {
     "@fastify/static": "^6.5.0",
     "@fastify/websocket": "^7.1.0",
-    "fastify": "^4.8.1"
+    "fastify": "^4.8.1",
+    "pino-pretty": "^9.1.1"
   }
 }

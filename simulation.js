@@ -7,16 +7,17 @@ export const createSimulation = () => {
     running: false
   }
 
-  const start = (numberOfPhilosophers = 5) => {
-    const num = +numberOfPhilosophers
-    const buffer = new SharedArrayBuffer(num * Int32Array.BYTES_PER_ELEMENT)
+  const start = numberOfPhilosophers => {
+    const buffer = new SharedArrayBuffer(
+      numberOfPhilosophers * Int32Array.BYTES_PER_ELEMENT
+    )
 
     state.forks = new Int32Array(buffer)
 
-    state.philosophers = Array(num)
+    state.philosophers = Array(numberOfPhilosophers)
       .fill(null)
       .map((_, philosopher, { length }) => {
-        const p = new Worker('./philosopher.js', {
+        const w = new Worker('./philosopher.js', {
           workerData: {
             philosopher,
             // resource hierarchy logic
@@ -25,16 +26,17 @@ export const createSimulation = () => {
           }
         })
 
-        p.postMessage(state.forks)
+        w.postMessage(state.forks)
 
-        return p
+        return w
       })
 
     state.running = true
   }
 
-  const stop = () => {
-    state.philosophers.forEach(p => p.terminate())
+  const stop = async () => {
+    await Promise.all(state.philosophers.map(w => w.terminate()))
+
     Object.assign(state, {
       forks: undefined,
       philosophers: undefined,
