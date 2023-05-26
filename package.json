@@ -34,7 +34,7 @@
     "*.{js,jsx}": "eslint --cache --fix"
   },
   "dependencies": {
-    "@fastify/static": "^6.10.1",
+    "@fastify/static": "^6.10.2",
     "@fastify/websocket": "^8.1.0",
     "fastify": "^4.17.0"
   }
