@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node webserver.js",
     "lint": "eslint .",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
